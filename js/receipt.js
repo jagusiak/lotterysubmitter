@@ -17,6 +17,12 @@
         return false;
     }
 
+    function validateString(element)
+    {
+        var value = element.val();
+        return value && value.length > 0;
+    }
+
     function validateEmail(element)
     {
         return /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/.test(element.val());
@@ -79,11 +85,29 @@
         }
         element.val(value);
     });
-
+    
     $('.validate.number').on('keyup', function (event) {
         var element = $(this);
         clear(element);
         if (validateNumber(element)) {
+            element.addClass('valid');
+        }
+    });
+
+    $('.validate.string').on('focusout', function (event) {
+        var element = $(this);
+        clear(element);
+        if (validateString(element)) {
+            element.addClass('valid');
+        } else {
+            element.addClass('invalid');
+        }
+    });
+
+    $('.validate.string').on('keyup', function (event) {
+        var element = $(this);
+        clear(element);
+        if (validateString(element)) {
             element.addClass('valid');
         }
     });
@@ -150,6 +174,32 @@
             element.addClass('valid');
         } else {
             element.addClass('invalid');
+        }
+    });
+    
+    $('#sub').on('submit', function(event) {
+        event.preventDefault();
+    });
+    
+    $('#main').on('submit', function(event) {
+        event.preventDefault();
+        $('#info').html('');
+        $('#main input').trigger('focusout');
+        $('#sub input').trigger('focusout');
+        if (!$('#main .invalid, #sub .invalid').length) {
+            var data = {};
+            $('#main input, #sub input').each(function() {
+                element = $(this);
+                data[element.attr('id')] = element.attr('type') === 'checkbox' ? (element.prop('checked') ? element.val() : '') : element.val();
+            });
+            $.post('receipt.php', data, function(response) {
+                if (response && response.success) {
+                    $('#main input[type="text"]').val('');
+                    $('#main input').removeClass('valid');
+                    $('#main input:first').focus();
+                }
+                $('#info').html(response.content);
+            }, 'json');
         }
     });
 })($);

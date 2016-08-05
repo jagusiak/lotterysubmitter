@@ -1,7 +1,6 @@
 {
     "name": "Seweryn",
     "require" : {
-        "jagusiak/loterryapi" : "*",
-        "jagusiak/jsonsimplestorage" : "*"
+        "jagusiak/lotteryapi" : "*"
     }
 }
